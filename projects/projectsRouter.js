@@ -12,7 +12,35 @@ router.get("/", async (req, res, next) => {
 });
 
 router.get("/:id", validateProjectId, (req, res) => {
-  res.json(res.project);
+  res.json(req.project);
+});
+
+router.post("/", validateProjectBody, async (req, res) => {
+  try {
+    const newProject = await Project.insert(req.body);
+    res.json(newProject);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/:id", validateProjectId, validateProjectBody, async (req, res) => {
+  try {
+    const newProject = await Project.update(req.params.id, req.body);
+    res.json(newProject);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/:id", validateProjectId, async (req, res) => {
+  try {
+    await Project.remove(req.params.id);
+    res.json({ message: "DELETED", project: req.project });
+    res.json(deletedProject);
+  } catch (error) {
+    next(error);
+  }
 });
 
 async function validateProjectId(req, res, next) {
@@ -27,6 +55,16 @@ async function validateProjectId(req, res, next) {
     }
   } catch (error) {
     next(error);
+  }
+}
+
+function validateProjectBody(req, res, next) {
+  if (Object.keys(req.body).length === 0) {
+    res.status(400).json({ error: "Please provide a project body" });
+  } else if (!req.body.name || !req.body.description) {
+    res.status(400).json({ error: "Please provide a name and a description." });
+  } else {
+    next();
   }
 }
 
