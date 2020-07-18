@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const ProjectRouter = require("../projects/projectsRouter");
+const ActionRouter = require("../actions/actionsRouter");
 
 const server = express();
 
@@ -8,6 +9,7 @@ server.use(express.json());
 server.use(morgan("tiny"));
 
 server.use("/api/projects", ProjectRouter);
+server.use("/api/actions", ActionRouter);
 
 server.use("/", (req, res) => {
   res.send({ message: "Projects API is running..." });
